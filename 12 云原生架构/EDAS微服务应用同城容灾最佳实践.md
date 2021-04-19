@@ -1,0 +1,127 @@
+# EDAS微服务应用同城容灾最佳实践
+
+[![img](https://upload.jianshu.io/users/upload_avatars/2509688/357a18dd-48ec-4030-84b6-63c81977ab11.jpg?imageMogr2/auto-orient/strip|imageView2/1/w/96/h/96/format/webp)](https://www.jianshu.com/u/12532d36e4da)
+
+[阿里云云栖号](https://www.jianshu.com/u/12532d36e4da)[![  ](https://upload.jianshu.io/user_badge/d859cce6-5b76-421c-aa99-ebe102569be0)](http://www.jianshu.com/p/d1d89ed69098)已关注
+
+22021.02.04 12:00:47字数 2,581阅读 229
+
+> 简介： 大多数业务应用只要做到同城双活，就可以避免掉大多数数据中心不可用故障。本实践就是帮助大家高效、低成本地实现自己的业务应用具备同城双活容灾能力。
+
+# 前言
+
+上云目前已经是绝大数企业首选的IT基础设施建设方案，但是云上仍然存在一些不确定因素（机房硬件故障、网络故障、断网/断电、人为操作失误），导致各大云厂商每年在不同的数据中心都会发生一些故障，所以建设具备容灾能力的业务应用是必需的。公共云上容灾解决方案涵盖同城双活、跨Region容灾和异地多活等容灾场景，对公共云上大多数中长尾客户来说，更需要的是一种对应用侵入性小甚至透明，但又能保证高可用的容灾方案，同城双活无疑是首选的容灾方案，大多数业务应用只要做到同城双活，就可以避免掉大多数数据中心不可用故障。
+
+本实践就是帮助大家高效、低成本地实现自己的业务应用具备同城双活容灾能力。通过这篇文章可以基于EDAS高效的实现同城双活容灾，在实现这些容灾场景的同时需要其他的阿里产品配合，也会一并介绍对应的解决方案，可以参考下面架构图：
+
+鉴于目前需要做容灾的主流架构都已经拆分为微服务架构，而且微服务架构本身也是一种具备更强容灾高可用能力的架构。微服务架构一般由网关（统一接入层）、RPC框架（Dubbo，Spring Cloud）、消息(MQ)、分布式数据库、缓存等核心软件构成，通过EDAS可以高效地实现入口流量切流、RPC路由容灾、多可用区部署等能力，参考下图：
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-cf204cc29ad71725.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+# 方案主要产品介绍
+
+# EDAS
+
+企业级分布式应用服务 EDAS（Enterprise Distributed Application Service）是应用全生命周期管理和监控的一站式 PaaS 平台，支持部署于Kubernetes/ECS，无侵入支持Java/Go/Python/PHP/.NetCore 等多语言应用的发布运行和服务治理，Java 支持 Spring Cloud、Apache Dubbo 近五年所有版本，多语言应用一键开启 Service Mesh。
+
+# 云解析DNS
+
+云解析 DNS（Domain Name System，简称DNS） 一种安全、快速、稳定、可靠的权威DNS解析管理服务。 云解析DNS为企业和开发者将易于管理识别的域名转换为计算机用于互连通信的数字IP地址，从而将用户的访问路由到相应的网站或应用服务器。
+
+# 负载均衡 SLB
+
+负载均衡SLB（Server Load Balancer）是一种对流量进行按需分发的服务，通过将流量分发到不同的后端服务来扩展应用系统的服务吞吐能力，并且可以消除系统中的单点故障，提升应用系统的可用性。
+
+# 云数据库 RDS
+
+阿里云关系型数据库RDS（Relational Database Service）是一种稳定可靠、可弹性伸缩的在线数据库服务。基于阿里云分布式文件系统和SSD盘高性能存储，RDS支持MySQL、SQL Server、PostgreSQL等引擎，并且提供了容灾、备份、恢复、监控、迁移等方面的全套解决方案，彻底解决数据库运维的烦恼。
+
+# 同城容灾各层解决方案
+
+# 应用的多可用区部署
+
+利用EDAS部署应用，可以快速实现将应用节点部署到不同可用区。下面分别从ECS 和K8S两种托管资源方式进行介绍。
+
+# ECS集群部署
+
+将不同可用区的ECS导入到EDAS，放到同一个集群中，在应用列表中选择创建应用：
+
+[图片上传失败...(image-30910f-1612411745509)]
+
+点击下一步选择倒入集群中的不同可用区的ECS节点，完成应用的创建， 既可以完成应用不同可用区节点部署的能力。
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-8c4dc4fabc8afcb4.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+# K8s集群部署
+
+将创建好的K8s集群（node 多可用区）导入到EDAS中, 创建应用的时候，在应用高级设置，选择多可用区部署，完成应用的创建， 即可以完成应用不同可用区节点部署的能力。
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-3057c8cbba06452f.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+# 流量接入层高可用
+
+EDAS部署的应用可以直接挂载多个SLB满足容灾的需求，完全不依赖SLB自身的容灾机制（SLB切换逻辑只发生在只有当主可用区整体不可用时，如机房整体断电、机房出口光缆中断等，负载均衡才会切换到备可用区），做到用户可控制，在一个地域内的多个可用区或多个地域内部署负载均衡实例和EDAS 应用节，然后使用云解析DNS对访问进行调度：
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-11681a87e7f24d03.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+点击刚才第一步多可用区部署的应用列表，进入具体的应用总览菜单页面，通过访问方式给入口应用（网关）配置多个SLB。
+
+[图片上传失败...(image-5728fe-1612411745509)]
+
+通过使用全局流量管理构建灵活的DNS解析方案，将上述创建的SLB添加到全局流量地址池中，基于健康检查结果，配置DNS容灾流量切换方案，可以做到在一个可用区不可用时，自动解析到另外一个可用的可用区SLB，做到智能化的接入层流量容灾能力处理。
+
+# RPC层面高可用
+
+EDAS支持多种微服务RPC框架，比如Dubbo，Spring Cloud，当用户使用如上RPC框架的时候，当部署的多可用区应用发生可用区不可用的时候，可以利用EDAS微服务治理的离群摘除能力，自动将不可用可用区的节点摘除下线，等可用区网络等故障恢复以后，自动将节点加回到应用集群中，做到智能化的故障处理。
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-5b974903ab5f0061.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+上述图中应用 A 调用的应用 B、应用 C、应用 D 均被策略控制，如果被A调用的应用对应实例返回错误率达到下限，异常实例将被摘除不再被A调用（检测恢复后重新加入被A调用）。
+
+首先进入微服务治理选择对应的RPC框架，比如这里选择的 Spring Cloud，选择离群摘除菜单，按照以下步骤进行配置：
+
+[图片上传失败...(image-52fc62-1612411745509)]
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-3aadad1b00346e8b.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+其中QPS下限按照EDAS应用的可观测能力，按照平常的QPS配置下限值。错误率在容灾场景下配置10%到50%区间。摘除实例<50%，保证集群的可用性，不引发上下游雪崩。恢复时间和累积探测次数都可以设置默认值，来保证可用区故障恢复后，自动将节点恢复。
+
+除了上面提供的离群摘除功能，EDAS还为部署的Provider应用提供了开启同机房优先调用的能力，在发生可用区的故障时，如果开启同机房优先调用，不会出现跨机房调用，那么RPC层面的流量就不需要利用离群摘除等容灾能力进行重新的节点流量处理或者隔离，从而保障故障发生时刻，业务完全没感知。
+
+# 微服务基础设施高可用
+
+EDAS在部署应用的时候，背后已经默认提供对应的微服务基础设施：比如注册中心，配置中心。这些对客户不暴露的微服务组件都已经实现同城容灾，在发生可用区不可用的情况，可以继续保证服务的可用性，大大降低了客户对容灾组件的运维复杂度。
+
+# 数据库层面高可用
+
+在完成应用部署结构以及RPC层面的流量同城双活处理后，对于数据可靠性，RDS MySQL提供高可用版本实例，采用一主一备的双机热备架构，适合80%以上的用户场景。主节点故障时，主备节点秒级完成切换，整个切换过程对应用透明；备节点故障时，RDS会自动新建备节点以保障高可用。在创建实例的时候选择高可用版，部署方案选择多可用区部署：
+
+![img](https://upload-images.jianshu.io/upload_images/2509688-0a24e7a5ca7bc9d5.image?imageMogr2/auto-orient/strip|imageView2/2/w/640/format/webp)
+
+image
+
+创建多可用区实例时，备机房将创建与主机房相同规格的Replica实例，主备机房的实例数据通过专门的复制通道同步。当主机房出现电力或网络问题时，Replica实例将升级为Master实例，底层系统就会自动把请求路由到备机房，从而实现故障切换。
+
+# 结束语
+
+经过上述方案，我们可以利用阿里云EDAS 等相关产品，快速低成本的搭建具备同城双活容灾业务应用，保障线上业务在可用区发生不可用时快速实现流量数据切换，从而保证业务可持续性，该方案对公共云90%以上的用户都能满足其容灾需求。
+
+作者：神鱼，阿里云解决方案架构师
+
+本文为阿里云原创内容，未经允许不得转载
+
+
+
+原文：https://www.jianshu.com/p/951c103dacec

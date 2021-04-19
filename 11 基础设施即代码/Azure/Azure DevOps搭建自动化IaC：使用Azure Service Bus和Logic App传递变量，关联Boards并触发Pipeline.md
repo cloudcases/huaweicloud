@@ -1,0 +1,177 @@
+# Azure DevOps搭建自动化IaC：使用Azure Service Bus和Logic App传递变量，关联Boards并触发Pipeline
+
+[![img](https://cdn2.jianshu.io/assets/default_avatar/11-4d7c6ca89f439111aff57b23be1c73ba.jpg)](https://www.jianshu.com/u/f05b09935765)
+
+[懒人奶昔](https://www.jianshu.com/u/f05b09935765)关注
+
+2021.02.25 16:44:21字数 1,174阅读 37
+
+## DEMO场景
+
+1. 当外部请求或系统事件发生后，在Azure DevOps中使用Service Bus Queue传递的变量触发Logic App，创建Work item并触发Pipeline
+
+2. 使用DevOps Rest Api将特定Build和Work item进行关联
+
+3. 使用Services hook将Build的结果传到Azure Service Bus并触发Logic App，实现对应Work item状态的实时自动更新
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-d31226ffada9d3bb.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   Overall Flow
+
+## 预备知识
+
+### Services hooks
+
+当DevOps项目中发生一些事件时，Services hooks可以在其他服务上运行特定任务。Publisher定义一系列事件，Subscription监听这些事件并定义基于这些事件的动作和运行的服务对象。
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/25751752-d0a8b2f0685272f4.png?imageMogr2/auto-orient/strip|imageView2/2/w/801/format/webp)
+
+Services hooks
+
+支持的事件请见[Service hooks event reference](https://links.jianshu.com/go?to=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Fdevops%2Fservice-hooks%2Fevents%3Fview%3Dazure-devops%23available-event-types)
+
+### Azure Services Bus
+
+Azure 服务总线是一个完全托管的企业消息代理，其中包含消息队列和发布订阅主题。命名空间（Namespace）是一个适用于所有消息传送组件的容器。消息可以发送到队列（Queue），或从队列接收。
+
+![img](https://upload-images.jianshu.io/upload_images/25751752-15f7a2b0c51f035f.png?imageMogr2/auto-orient/strip|imageView2/2/w/780/format/webp)
+
+队列
+
+
+也可以通过主题（Topic）发送和接收消息。 队列通常用于点到点通信，而主题则用于发布/订阅方案。
+
+![img](https://upload-images.jianshu.io/upload_images/25751752-118cdbd0d5242ad6.png?imageMogr2/auto-orient/strip|imageView2/2/w/780/format/webp)
+
+主题
+
+
+对于接收操作，Service Bus API客户端启用两种不同的显式模式：`Receive-and-Delete` 和`Peek-Lock` 。
+`Receive-and-Delete`模式告知代理将它发送到接收客户端的所有消息都在发送时视为已处置。 这意味着在代理将消息置于线路上之后，它会立即被视为已使用。 如果消息传输失败，则消息会丢失。如果各个消息中包含的数据价值较低或者只在很短时间内才有意义，则可以选择此模式。
+`Peek-Lock`模式告知代理接收客户端希望显式处置收到的消息。消息可供接收方进行处理，同时在服务中保持在exclusive lock下，以便其他竞争接收方无法看到它。
+
+
+
+### Azure DevOps REST API
+
+REST API是支持HTTP操作的服务端点，这些操作提供对服务资源的创建，检索，更新或删除访问。例如Builds - Queue API，使用`parameters`传递参数。
+
+
+
+```cpp
+POST https://dev.azure.com/{organization}/{project}/_apis/build/builds?api-version=6.1-preview.6
+```
+
+
+
+## 准备工作
+
+- Azure Service Bus资源
+- Azure Logic App资源
+- Azure DevOps Project
+
+## 步骤
+
+#### A. 自动触发并使用变量跑Pipeline
+
+1. 自定义work item的模板，加入参数等所需栏位和状态。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-c233746bf521d206.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   Customize process
+
+2. 之后新建Work item时你会用到栏位的name。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-32ba7ddb93c38fd5.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   name
+
+3. 传递的变量会放在overrideParameters中。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-418f368a950e21c7.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   Variables
+
+4. 右上角新建这些Variables，务必勾选可以override。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-2eadea9d22560c19.png?imageMogr2/auto-orient/strip|imageView2/2/w/952/format/webp)
+
+   override
+
+5. 使用Services Bus Queue触发的Logic App，Parse消息取到变量。其中peek-lock保证每一条消息处理完成后才会被丢弃。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-1990fdc90db1b8c6.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   image.png
+
+6. 选择DevOps相关的action，身份验证后建立与Azure DevOps的连接，新建一个work item。其中自定义的栏位使用Other Fields进行传递。左侧即为之前提到的栏位name，右侧为parse出来的变量值。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-6062d6214d45bccb.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   新建work item
+
+7. 触发Azure Pipeline，使用传递的变量新建一个Build，变量写在Parameter中。变量值可以用parse出来的，也可以用work item中的。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-ef5d6e2b40dbf708.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   新建Build
+
+8. 至此自动触发并使用变量跑Pipeline已完成，最后complete这条消息，代表处理完成。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-d3b25c06fc87e6c5.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   complete 消息
+
+#### B. 实时自动更新Work item状态
+
+1. 在新建Build后加入更新状态System.State。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-91816f8f84eccea4.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   更新状态
+
+2. 关联Work item和其对应的build在这里使用tag传递Work item ID的方式完成。首先在Azure DevOps中新建一个PAT。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-20e5f78a1257119e.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   PAT
+
+3. 使用Azure DevOps Rest Api将创建的Build加上TAG。这里把PAT存在了Keyvault当中，在身份验证的password中引用。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-1e6503fd22d800f7.png?imageMogr2/auto-orient/strip|imageView2/2/w/1036/format/webp)
+
+   Add Tag
+
+4. 在DevOps的Project Setting中选择Services hooks -> Azure Services Bus。Trigger为Build成功，使用不同于A中的Services Bus Queue，填入其连接字符串。（默认只有project administrators有权限，请进行相关授权）
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-a98e3df2a9512a6c.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   Services hooks
+
+5. 使用不同于A中的另一个Service Bus Queue来接收消息，触发Logic App2。当接收到Build成功的消息后，使用Azure DevOps Rest Api读取TAG内容。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-fadaa930a9c74bc5.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   读取TAG
+
+1. 更新对应Work item的状态。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-d50a30b138aa38e8.png?imageMogr2/auto-orient/strip|imageView2/2/w/1174/format/webp)
+
+   更新对应Work item的状态
+
+2. 使用Service Bus Explorer发送json格式消息进行测试。
+
+   ![img](https://upload-images.jianshu.io/upload_images/25751752-ee46dcbeafce0d5c.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+   Test
+
+### 相关阅读
+
+[Integrate with service hooks - Azure DevOps | Microsoft Docs](https://links.jianshu.com/go?to=https%3A%2F%2Fdocs.microsoft.com%2Fen-us%2Fazure%2Fdevops%2Fservice-hooks%2Foverview%3Fview%3Dazure-devops)
+
+
+
+原文：https://www.jianshu.com/p/dc14e6b3c5f5

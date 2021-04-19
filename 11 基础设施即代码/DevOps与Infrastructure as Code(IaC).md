@@ -1,0 +1,131 @@
+# DevOps与Infrastructure as Code(IaC)
+
+[![img](https://upload.jianshu.io/users/upload_avatars/19940299/3b53eabe-2491-4183-9200-c86aeffb5ce9?imageMogr2/auto-orient/strip|imageView2/1/w/96/h/96/format/webp)](https://www.jianshu.com/u/4ac237187457)
+
+[未知数Q](https://www.jianshu.com/u/4ac237187457)关注
+
+2020.07.23 11:22:19字数 2,658阅读 241
+
+>    早些年，我们的运维几乎是死板一块，大致过程是：开发人员开发好应用软件，然后提交给运维人员系统架构图，运维根据系统架构图，设计出部署架构图，还需要做好系统所需的前期工作，比如部署服务器、打通网络、调整服务器参数等等工作。随后选定日期进行生产上线，上线完毕后和开发、业务确认成功与否。同时，生产过程中若出现问题，看日志，和开发一起排查问题，等等等等。但是近几年，随着DevOps的普及，运维工作产生了某些变化。
+
+------
+
+
+
+# DevOps产生的背景
+
+## 全球的经济发展和互联网新技术的诞生
+
+   在全球化经济蓬勃、移动互联网等新技术催生出新的商业形态，而新的商业形态反过来又强化和促进了企业数字化转型的迫切性和IT在转型过程中扮演角色的重要性。
+
+## 新技术为新的研发工程实践的成熟度提供了基础
+
+   云计算（软件定义计算、存储、网络）为代表的灵活、弹性的基础设施供给能力；微服务架构为代表的架构实践，为软件的持续交付降低了风险，提升了灵活性和交付效率；Docker为代表的新的软件交付模式，简化了交付难度，且非常适合承载微服务架构下的软件交付；以敏捷开发为代表的研发工程实践已经达到了一定的成熟度，小批量、限制在制品等实践方式，使得流式持续交付成为可能；Lambda为代表的Severless计算服务，在无需管理基础设施的情况下可自动运行代码并管理计算资源，减少了不必要的费用。
+
+## 传统的研发模式和运维管理体系不适应新的商业形态下的新变化、新要求
+
+   新的世界经济发展需要与之匹配的研发模式和运维管理体系，市场瞬息万变，今天开发的产品，明天可能就不需要了，管理者需要实时根据市场的变化，来调整需求，原先需求调研、产品设计、产品研发、产品运维一整套流程可能已经不能适应。**取而代之，顺应市场、快速响应、快速实现、高质量交付的模式正在被越来越多的企业所采用。**
+
+## 人员密集型开发和维护体系无以为继
+
+   早些年，一个企业会养一大帮开发和运维人员，形成人员的“重资产”，而历史上遗留下来的技术债务，往往都被这些人员以小修小补的方式不断维系，很难满足数字化转型的要求。新的时代有新的要求，转型的迫切性大大提高，转型慢的企业有可能被时代所淘汰，**产品端的创新必然要求开发和运维端的创新**。
+
+## 软件生命周期中的隔阂制约了快速交付，不适应市场
+
+>    第一个隔阂是产线和开发测试组的隔阂，敏捷（Agile）的出现就是来解决这个问题的，第二个隔阂就是开发测试和运维之间的隔阂，特别关注的是简化和自动化源代码和构建管理、集成和测试，以及整体工作流程，就是要通过DevOps来解决。
+
+   对于我们的许多客户来说，加快软件交付速度和推动云应用转型的努力**最初集中在开发人员身上**，这是可以理解的。自上而下 "的DevOps计划侧重于创建持续交付(CD)管道和一致性的运维过程(Operate)，以消除与软件交付生命周期(SDLC)和基础价值流相关的手动流程、交接和瓶颈。
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-3f761067b0cd157e.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+Agile vs DevOps
+
+------
+
+
+
+> 现代数字企业的本质之争在于速度和安全之间。随着软件开发速度似乎无止境地提高，IT部门正在研究有哪些工具可以提供防护和治理--而不至于让事情变慢。
+
+   **基础架构即代码（Infrastructure-as-Code）这时就作为解决方案和开发运维双方的共同语言而产生。**随着开发人员要求云一样的消费和自动化继续成为成功的DevOps组织的秘密，工具和规范作为受欢迎的解决方案出现。
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-af66df973b0cdc95.png?imageMogr2/auto-orient/strip|imageView2/2/w/953/format/webp)
+
+DevOps自动化
+
+   利用基础设施即代码（IaC）和管道来实现配置的自动化从而达到DevOps是显而易见的。但迄今为止，仍然有许多企业主要依赖独立的自动化工具和一次性脚本，虽然这种方法是对手动工作流和流程的改进，但IaC提供的功能远远超过传统的自动化实践。它实现了基础设施和应用程序的全栈部署自动化；它提供了源控制的基础设施和软件包。它引入软件开发实践，应用于基础设施的构建和操作程序；基础设施自我监控系统配置，基础设施自我修复到已知的良好状态或版本。
+
+> 想要通过IaC来实现DevOps，那就不得不提各种各样的DevOps工具甚至是平台，这其中最重要的一个IaC平台就是容器编排调度平台--Kubernetes
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-ede06b26170537cd.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+DevOps工具集
+
+   **Kubernetes的设计目的是为了从根本上支持模块化以及自动化的云原生应用，帮助企业附能DevOps。**Kubernetes整合了插件、附加组件、服务和接口来扩展平台的核心功能。
+
+>    面对DevOps所需的自动化要求，数据存储这部分也必须得从传统稳态的提供方式向现代敏态的提供方式进行转变，才能实现IaC基础设施即代码的功能，那Kubernetes是怎样实现的呢？
+
+# Kubernetes的数据持久化 
+
+   最初当Kubernetes编排开始时，各类第三方厂商或开源社区个人都提出了自己对存储区域如何连接到Kubernetes的定义，而这让第三方厂商在开发那些连接到各种容器编排器的驱动用于Kubernetes的数据持久化时，往往无法让第三方管理工具顺利运行，于是开发工作变得非常困难。如同下图对接各式插头。
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-c61d6d066ba618ee.png?imageMogr2/auto-orient/strip|imageView2/2/w/477/format/webp)
+
+存储对接就像各式各样的插头
+
+
+
+   能否有统一接口来帮助Kubernetes解决以上的问题呢？
+
+   于是，Kubernetes社区尝试了一个名为FlexVolume的规范，但它被认为是一个效率低下，甚至繁琐复杂的解决方案。驱动程序只能在Kubernetes发布期间更新。
+
+   所以Kubernetes社区决定开发一个规范，允许DellEMC等厂商提供新的驱动，以软件的形式作为规范的实现。
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-1a52d453ae9c6f33.png?imageMogr2/auto-orient/strip|imageView2/2/w/670/format/webp)
+
+能否有统一的接口？
+
+
+
+> CSI被认为是答案，它提供CSI卷和存储块的动态供应功能 。更具体地说，我们来看看容器存储接口(CSI)是如何在扩展Kubernetes的功能及其对新的和自定义硬件的支持方面发挥作用的。
+
+## Kubernetes的持久化存储插件CSI 
+
+   CSI容器存储插件基本上是一个规范，它定义了存储区域如何连接到Kubernetes集群。CSI的目的是将最终的控制权交给IT管理员，同时仍然允许开发人员直接配置自己的存储，而不是等待别人为他们配置。通过CSI，存储管理员为开发人员分配存储资源供其使用，然后开发人员将以持久卷的形式使用该分配。同时CSI允许第三方存储提供商提供持久性和动态存储块。
+
+   **CSI插件与核心Kubernetes卷插件的主要区别在于，CSI插件不需要与核心Kubernetes二进制文件一起编译和发布。**
+
+   CSI插件的其他功能也同样有趣。原始块卷让用户可以为块卷创建CSI驱动，并实现将这些块分配给Kubernetes运行时。Snapshot则支持在任何时候创建和恢复存储块快照。像MapR Data Fabric这样的插件甚至支持Liveness Probe这样的命令来允许容器探测存储驱动程序。
+
+   经过认证的CSI插件可以立即集成到客户的Kubernetes环境中。来自DellEMC和VMware等厂商的CSI插件可以自动实现动态调配，并给IT管理员提供了存储类，让他们可以定义哪些存储区域可以使用，该存储区域内将分配多少容量，以及谁可以访问它。它使IT管理员能够设置访问策略和配额。
+
+   CSI旨在应用于CI/CD管道。无论定义什么存储类，都会自动为他们的应用或微服务提供。这是拥抱IaC基础架构即代码的大趋势的一部分，而基础架构是 "内置 "到CI/CD管道中的，它允许开发人员的独立性和基于策略的供应、配置管理和流程的自动化交付。
+
+> DellEMC全系存储都支持CSI规范。
+
+所有的DellEMC存储CSI插件都可以通过GitHub获取。
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-cefc28bf18b1b34f.png?imageMogr2/auto-orient/strip|imageView2/2/w/867/format/webp)
+
+可通过GitHub获取CSI信息
+
+> 不仅提供用于对接Kubernetes的CSI插件，还有相应REST API、vRO、Ansible、Python SDK、PowerShell等接口，用于完全附能DellEMC存储的Infrastructre as Code能力。
+
+![img](https://upload-images.jianshu.io/upload_images/19940299-9f7f58fa16e648e7.png?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+全系存储支持基础设施即代码能力
+
+
+
+------
+
+# 总结
+
+DellEMC一直专注在与领先的DevOps和自动化工具的集成，通过IaC基础设施即代码以加速客户应用的部署和生命周期管理，从而附能客户DevOps的能力。
+
+
+
+原文：https://www.jianshu.com/p/95817fb255ad
