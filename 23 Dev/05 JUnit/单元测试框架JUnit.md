@@ -1,0 +1,520 @@
+# 单元测试框架:JUnit
+
+[![img](https://upload.jianshu.io/users/upload_avatars/2222997/500ed1fcf8e2?imageMogr2/auto-orient/strip|imageView2/1/w/96/h/96/format/webp)](https://www.jianshu.com/u/2baf4dc0fbe6)
+
+[Whyn](https://www.jianshu.com/u/2baf4dc0fbe6)关注
+
+0.1752017.09.21 14:34:26字数 3,781阅读 4,406
+
+## 简介
+
+**测试** 在软件开发中是一个很重要的方面，良好的测试可以在很大程度决定一个应用的命运。
+软件测试中，主要有3大种类：
+
+- [**单元测试**](https://en.wikipedia.org/wiki/Unit_testing)
+  单元测试主要是用于测试程序模块，确保代码运行正确。单元测试是由开发者编写并进行运行测试。一般使用的测试框架是 [JUnit](http://junit.org/junit4/) 或者 [TestNG](https://github.com/cbeust/testng)。测试用例一般是针对*方法* 级别的测试。
+- [**集成测试**](https://en.wikipedia.org/wiki/Integration_testing)
+  集成测试用于检测系统是否能正常工作。集成测试也是由开发者共同进行测试，与单元测试专注测试个人代码组件不同的是，集成测试是系统进行跨组件测试。
+- [**功能性测试**](https://en.wikipedia.org/wiki/Functional_testing)
+  功能性测试是一种质量保证过程以及基于测试软件组件的规范下的由输入得到输出的一种黑盒测试。功能性测试通常由不同的测试团队进行测试，测试用例的编写要遵循组件规范，然后根据测试输入得到的实际输出与期望值进行对比，判断功能是否正确运行。
+
+## 概述
+
+本文只对 [**单元测试**](https://en.wikipedia.org/wiki/Unit_testing) 进行介绍，主要介绍如何在 [Android Studio](https://developer.android.com/studio/index.html?gclid=Cj0KCQjwgIPOBRDnARIsAHA1X3SC5vOHyIHQnIIfJ8hqJSuTiCG6p3u2ff_ti3EIVeCIGJLnP82YCKoaArSPEALw_wcB) 下进行单元测试，单元测试使用的测试框架为 [JUnit](http://junit.org/junit4/)
+
+## 好处
+
+可能目前仍有很大一部分开发者未使用 [**单元测试**](https://en.wikipedia.org/wiki/Unit_testing) 对他们的代码进行测试，一方面可能是觉得没有必要，因为即使没有进行单元测试，程序照样运行得很好；另一方面，也许有些人也认同单元测试的好处，但是由于需要额外的学习成本，所以很多人也是没有时间或者说是没有耐心进行学习······
+这里我想说的是，如果大家去看下 [github](https://www.jianshu.com/p/www.github.com) 上目前主流的开源框架，star 数比较多的项目，一般都有很详尽的测试用例。所以说，单元测试对于我们的项目开发，还是挺有好处的。
+至于单元测试的好处，我这里提及几点：
+
+- 保证代码运行与我们预想的一样，代码正确性可以得到保证
+- 程序运行出错时，有利于我们对错误进行查找（因为我们忽略我们测试通过的代码）
+- 有利于提升代码架构设计（用于测试的用例应力求简单低耦合，因此编写代码的时候，开发者往往会为了对代码进行测试，将其他耦合的部分进行解耦处理）
+  ······
+
+## [JUnit](http://junit.org/junit4/) 简介
+
+> JUnit is a simple framework to write repeatable tests. It is an instance of the xUnit architecture for unit testing frameworks.
+
+[JUnit](http://junit.org/junit4/) 是一个支持可编写重复测试用例的简单框架。它是 [xUnit](https://xunit.github.io/) 单元测试框架架构的一个子集。
+
+- [JUnit 的使用方法和术语](https://github.com/junit-team/junit4/wiki)
+
+|                             名称                             |                             解释                             |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| [Assertions](https://github.com/junit-team/junit4/wiki/Assertions) |                       单元测试实用方法                       |
+| [Test Runners](https://github.com/junit-team/junit4/wiki/Test-runners) |             测试实例应当怎样被执行（测试运行器）             |
+| [Aggregating tests in Suites](https://github.com/junit-team/junit4/wiki/Aggregating-tests-in-suites) | 合并多个相关测试用例到一个测试套件中（当运行测试套件时，相关用例就会一起被执行） |
+| [Test Execution Order](https://github.com/junit-team/junit4/wiki/Test-execution-order) |                     指定测试用例运行顺序                     |
+| [Exception Testing](https://github.com/junit-team/junit4/wiki/Exception-testing) |                  如何指定测试用例期望的异常                  |
+| [Matchers and assertThat](https://github.com/junit-team/junit4/wiki/Matchers-and-assertthat) | 如何使用 [Hamcrest](http://hamcrest.org/) 的匹配器 (`matchers`) 和更加具备描述性的断言 (`assertions`) |
+| [Ignoring Tests](https://github.com/junit-team/junit4/wiki/Ignoring-tests) |                    失能类或方法的测试用例                    |
+| [Timeout for Tests](https://github.com/junit-team/junit4/wiki/Timeout-for-tests) | 指定测试用例的最大运行时间（超过这个时间，自动结束测试用例） |
+| [Parameterized Tests](https://github.com/junit-team/junit4/wiki/Parameterized-tests) |           测试用例运行多次，每次都使用不同的参数值           |
+| [Assumptions with Assume](https://github.com/junit-team/junit4/wiki/Assumptions-with-assume) |                类似断言，但不会使测试用例失败                |
+|   [Rules](https://github.com/junit-team/junit4/wiki/Rules)   |           为测试用例增加`Rules`（相当于添加功能）            |
+| [Theories](https://github.com/junit-team/junit4/wiki/Theories) |           使用随机生成的数据使测试用例更加科学严谨           |
+| [Test Fixtures](https://github.com/junit-team/junit4/wiki/Test-fixtures) |      为测试方法或者类指定预备的`set up`和`clean up`方法      |
+| [Categories](https://github.com/junit-team/junit4/wiki/Categories) |                 将测试用例组织起来，方便过滤                 |
+|                           **···**                            |                           **···**                            |
+
+- [JUnit 的使用方法和术语详解](https://github.com/junit-team/junit4/wiki)
+
+[Assertions](https://github.com/junit-team/junit4/wiki/Assertions) - 断言
+[JUnit](http://junit.org/junit4/) 为所有的原始类型和对象，数组（原始类型数组或者对象数组）提供了多个重载的断言方法（`assertion method`）。断言方法的参数第一个为预期值，第二个为实际运行的值。另一个可选方法的第一个参数是作为失败输出的字符串信息。还有一个稍微有些区别的断言方法:`assertThat`。`assertThat`的参数有一个可选的失败信息输出，实际运行的值和一个 `Matcher` 对象。请知悉`assertThat`的预期值和实际运行值与其他的断言方法位置是相反的。
+**ps:**实际开发中，建议采用 [Hamcrest](http://hamcrest.org/) 提供的断言方法：`assertThat`，因为这个方法一方面写出的代码更具可读性，一方面当断言失败时，这个方法会给出具体的错误提示信息。
+
+更多的 [Assertions](https://github.com/junit-team/junit4/wiki/Assertions) 信息，请查看文档：[Assert](http://junit.org/junit4/javadoc/latest/index.html)
+
+[Test Runners](https://github.com/junit-team/junit4/wiki/Test-runners) - 测试运行器
+当一个类被注解`@RunWith`或者集成一个被`@RunWith`注解的类时，[JUnit](http://junit.org/junit4/) 会把测试用例运行在该类上，而不是内置的运行器上。
+
+ps: [JUnit](http://junit.org/junit4/) 的默认运行器是 `BlockJUnit4ClassRunner`。
+如果类注解为`@RunWith(JUnit4.class)`，则使用的是默认的测试运行器 `BlockJUnit4ClassRunner`。
+
+更多详细信息，请查看文档：[@RunWith](http://junit.org/junit4/javadoc/latest/org/junit/runner/RunWith.html)
+
+[Aggregating tests in Suites](https://github.com/junit-team/junit4/wiki/Aggregating-tests-in-suites) - 测试套件
+使用套件（`Suite`）作为运行器使得你可以手动建造一个可以容纳许多类的测试用例。使用测试套件时，你需要创建一个类，然后为其注解上`@RunWith(Suite.class)`和`@SuiteClasses(TestClass1.class, ...)`，这样，当你运行这个类时，测试套件各个类的测试用例就会全部被执行。
+
+
+
+```kotlin
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+  TestFeatureLogin.class,
+  TestFeatureLogout.class,
+  TestFeatureNavigate.class,
+  TestFeatureUpdate.class
+})
+
+public class FeatureTestSuite {
+  // the class remains empty,
+  // used only as a holder for the above annotations
+}
+```
+
+[Test Execution Order](https://github.com/junit-team/junit4/wiki/Test-execution-order)
+从 [JUnit](http://junit.org/junit4/) 4.11版本开始，[JUnit](http://junit.org/junit4/) 默认使用确定的，不可预见性的测试用例执行顺序（`MethodSorters.DEFAULT`）。要改变测试用例执行顺序，只需简单为测试类添加`@FixMethodOrder`注解，并指定一个方法排序规则：
+`@FixMethodOrder(MethodSorters.JVM)`:由JVM决定方法执行顺序，在不同的JVM上，执行顺序可能不同。
+`@FixMethodOrder(MethodSorters.NAME_ASCENDING)`:按方法名进行排序（字典序）进行执行。
+
+
+
+```java
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TestMethodOrder {
+
+    @Test
+    public void testA() {
+        System.out.println("first");
+    }
+    @Test
+    public void testB() {
+        System.out.println("second");
+    }
+    @Test
+    public void testC() {
+        System.out.println("third");
+    }
+}
+```
+
+[Exception Testing](https://github.com/junit-team/junit4/wiki/Exception-testing)
+你如何验证代码抛出的异常是你所期望的？验证代码正常走完是很重要，但是确保代码在异常情况下表现也与预期一样也是很重要的，比如:
+
+
+
+```java
+new ArrayList<Object>().get(0);
+```
+
+这句代码应该抛出一个 `IndexOutOfBoundsException`异常。`@Test`注解有一个可选的参数 `expected`，它可以携带一个`Throwable`的子类。如果我们希望验证`ArrayList`能正确抛出一个异常，我们应该这样写：
+
+
+
+```java
+@Test(expected = IndexOutOfBoundsException.class) 
+public void empty() { 
+     new ArrayList<Object>().get(0); 
+}
+```
+
+参数`expected`的使用应该慎重。只要测试代码中的任何一句抛出一个`IndexOutOfBoundsException`异常，那么上面的测试用例就会通过。对于代码比较长的测试用例，推荐使用 `ExpectedException` 规则。
+
+更多详情，请查看：[Exception testing](https://github.com/junit-team/junit4/wiki/Exception-testing)
+
+[Matchers and assertThat](https://github.com/junit-team/junit4/wiki/Matchers-and-assertthat)
+
+- `assertThat`的一个通用格式为：
+
+
+
+```java
+assertThat([value], [matcher statement])
+```
+
+示例：
+
+
+
+```java
+assertThat(x, is(3));
+assertThat(x, is(not(4)));
+assertThat(responseString, either(containsString("color")).or(containsString("colour")));
+assertThat(myList, hasItem("3"));
+```
+
+`assertThat`的第二个参数是一个`Matcher`.
+详细的`Matcher`介绍，可以查看以下两个文档：
+
+- [JUnit Matchers](http://junit.org/junit4/javadoc/latest/org/junit/matchers/JUnitMatchers.html)：JUnit 提供的`Matcher`
+- [Hamcrest CoreMatchers](http://junit.org/junit4/javadoc/latest/org/hamcrest/CoreMatchers.html)：Hamcrest 提供的`Matcher`
+
+[Ignoring Tests](https://github.com/junit-team/junit4/wiki/Ignoring-tests)
+由于某些原因，你不希望测试用例运行失败，你只想忽略它，那你只需暂时失能这个测试用例即可。
+在 [JUnit](http://junit.org/junit4/) 中，你可以通过注释方法或者删除`@Test`注解来忽略测试用例；但是这样的话测试运行器就不会对该测试用例进行相关报告。另一个方案是为测试用例在`@Test`注解前面或后面添加上`@Ignore`注解；那么测试运行器运行后，就会输出相关测试用例忽略数目，运行所有测试用例的数目和测试用例失败的数目显示。
+注意下`@Ignore`注解可以携带一个可选参数（`String`类型），如果你想记录测试用例忽略的原因，可以使用这个参数：
+
+
+
+```java
+@Ignore("Test is ignored as a demonstration")
+@Test
+public void testSame() {
+    assertThat(1, is(1));
+}
+```
+
+[Timeout for Tests](https://github.com/junit-team/junit4/wiki/Timeout-for-tests)
+对于失控或者运行时间太长的测试用例，则自动被认为失败，有两种方法可以实现这个动作。
+
+- 为`@Test`增加`timeout`参数
+  你可以为一个测试用例指定一个超时时间（毫秒），在规定时间内，如果测试用例没有运行结束，那么测试用例运行所在线程就会抛出一个异常，从而引起测试失败。
+
+
+
+```java
+@Test(timeout=1000)
+public void testWithTimeout() {
+  ...
+}
+```
+
+这种实现方式是通过将测试用例方法运行在另一个单独的线程中。如果测试用例运行时间超过规定的时间，那么测试用例就会失败，[JUnit](http://junit.org/junit4/) 就会打断执行测试用例的线程。如果测试用例内部执行有可以中断的操作，那么运行测试用例的线程就会退出（如果测试用例内部是一个无限循环，那么运行测试用例的线程将会永远运行，而其他测试用例仍在其他的线程上执行）。
+
+- **Timeout Rule** （应用到测试类的所有测试用例）
+  `Timeout Rule`会将同一个超时时间应用到测试类的所有测试方法中，并且如果测试用例`@Test`带有`timeout`参数，则会叠加到一起（实际测试中，并没有叠加的效果，甚至`tiemout`参数并不生效，依旧还是以`Timeout Rule`为准）
+
+
+
+```java
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.Timeout;
+
+public class HasGlobalTimeout {
+    public static String log;
+    private final CountDownLatch latch = new CountDownLatch(1);
+
+    @Rule
+    public Timeout globalTimeout = Timeout.seconds(10); // 10 seconds max per method tested
+
+    @Test
+    public void testSleepForTooLong() throws Exception {
+        log += "ran1";
+        TimeUnit.SECONDS.sleep(100); // sleep for 100 seconds
+    }
+
+    @Test
+    public void testBlockForever() throws Exception {
+        log += "ran2";
+        latch.await(); // will block 
+    }
+}
+```
+
+`Timeout rule`指定的超时时间`timeout`会应用到所有的测试用例中，包括任何的`@Before`和`@After`方法。如果测试方法是一个无限循环（或者是无法响应中断操作），那么`@Afte`注解的方法永远不会被执行。
+
+[Parameterized Tests](https://github.com/junit-team/junit4/wiki/Parameterized-tests) - 参数化测试
+对于单元测试来说，如果想要同一个测试用例中测试多组不同的数据，那么只能手动执行一次后，更改数据，再进行执行，而使用参数化测试的话，则可以将上述的行为进行自动化，我们所需要做的就是提供一个数据集合，然后创建相应的成员变量用来接收数据集合传递过来的数据（在测试类构造器中接收），最后运行测试用例时，参数化测试运行器就会依次从数据集合中取出一个数据，并传给测试用例运行：
+
+
+
+```java
+//功能类
+
+public class Math {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+//单元测试类
+@RunWith(Parameterized.class) //指定参数化测试运行器
+public class MathTest {
+    private int a;  //声明成员变量用于接收数据
+    private int b;
+
+    public MathTest(int a, int b) { //接受集合数据
+        this.a = a;
+        this.b = b;
+    }
+
+    @Parameterized.Parameters //创建参数集合
+    public static Collection<Object[]> data() {
+        Collection<Object[]> collection = new ArrayList<>();
+        collection.add(new Object[]{1, 2});
+        collection.add(new Object[]{10, 20});
+        collection.add(new Object[]{30, 40});
+        return collection;
+    }
+
+    @Test
+    public void add() throws Exception {
+        assertThat(Math.add(a, b), is(equalTo(30)));
+    }
+
+}
+```
+
+[Assumptions with Assume](https://github.com/junit-team/junit4/wiki/Assumptions-with-assume) - 前置条件
+前置条件与断言类似，只是断言在不匹配时，测试用例就会失败，而前置条件在不匹配时只会使测试用例退出。
+前置条件的使用场景是：当你的代码在不同的环境下，可能有不同的结果时，如果你明确后续的测试代码是基于某一特定的环境下，才进行测试，那么，借助前置条件，就可以实现所需功能。
+比如，假设 Windows 平台的文件路径分隔符为"\"，而 Linux 平台的为"/”，假设我们的测试用例只想在 Linux 平台上进行测试，那么：
+
+
+
+```java
+@Test
+public void filenameIncludesUsername() {
+        assumeThat(File.separatorChar, is('/'));
+        assertThat(new User("optimus").configFileName(), is("configfiles/optimus.cfg"));
+    }
+```
+
+如果在 Windows 平台运行测试用例时，`assumeThat(File.separatorChar, is('/'))`就会不匹配，那么测试用例就直接退出（类似异常机制）。
+
+[Rules](https://github.com/junit-team/junit4/wiki/Rules) - 规则
+`Rules`允许为测试用例增加灵活的条件或者是重新定义每个类的测试用例行为。测试类可以重新或者继承一下任一提供的`Rules`，或者自己自定义一个。
+
+|       Rule        |                         Description                          |
+| :---------------: | :----------------------------------------------------------: |
+|  TemporaryFolder  |     创建临时文件夹/文件（测试方法完成后文件被自动删除）      |
+| ExternalResource  |                  外部资源`Rules`的一个基类                   |
+|  ErrorCollector   |                         收集错误信息                         |
+|     Verifier      |                    具备校验功能的一个基类                    |
+|    TestWatcher    |                  具备测试结果记录的一个基类                  |
+|     TestName      |       该`Rules`对象可在测试用例内部获取测试用例方法名        |
+|      Timeout      |             为测试类所有测试用例约束最长运行时间             |
+| ExpectedException |    该类使得测试用例能在方法内判别测试代码是否抛出预期异常    |
+|     ClassRule     |  类级别`Rule`，用于静态变量的注解，在测试类运行时只执行一次  |
+|       Rule        | 方法级别的`Rule`，用于成员变量的注解，在类的每个测试用例执行时都会被执行 |
+|     RuleChain     |                    为多个`Rules`指定顺序                     |
+|     TestRule      |                      自定义`Rules`基类                       |
+
+这里简单介绍下自定义`Rules`，假设我们要为所有的测试用例输出前后添加"------------"，那么，我们需要先创建一个`Rule`：
+
+
+
+```java
+public class CustomerRule implements TestRule {
+    @Override
+    public Statement apply(final Statement base, Description description) {
+        return new Statement(){
+            @Override
+            public void evaluate() throws Throwable {
+                System.out.println("--------------------------");
+                base.evaluate();
+                System.out.println();
+                System.out.println("--------------------------");
+            }
+        };
+    }
+}
+```
+
+然后把自定义的`TestRule`运用到测试类里面即可：
+
+
+
+```java
+    @Rule
+    public CustomerRule customerRule = new CustomerRule();
+
+    @Test
+    public void testCustom() {
+        assertThat(1, is(1));
+    }
+```
+
+更多`Rules`详细信息，请查看：[Rules](https://github.com/junit-team/junit4/wiki/Rules)
+
+[Theories](https://github.com/junit-team/junit4/wiki/Theories) - 测试理论
+[JUnit](http://junit.org/junit4/) 中的 [Theories](https://github.com/junit-team/junit4/wiki/Theories) 可以理解成一个测试理论，该理论把测试分为两部分：一个是提供测试数据（单个数据用`@DataPoint`注解，集合数据使用`@DataPoints`注解），数据提供者必须为静态成员/方法；另一个是理论本身，也即测试用例方法。
+[Theories](https://github.com/junit-team/junit4/wiki/Theories) 的测试用例允许参数传递（普通测试用例测试方法不能携带参数），参数传递规则是首先从数据集合中取出一个作为第一个参数，然后依次取出集合的元素（包含已作为参数1的那个数据）作为第二个参数····
+看下下面的测试用例就会比较清楚 [Theories](https://github.com/junit-team/junit4/wiki/Theories) 的运作流程：
+
+
+
+```java
+@RunWith(Theories.class)
+public class MathTest {
+//    @DataPoint
+//    public static int arg0 = 1;
+//    @DataPoint
+//    public static int arg1 = 10;
+//    @DataPoint
+//    public static int arg2 = 0;
+    @DataPoints
+    public static int[] args = new int[]{1, 10, 0};
+    
+    @Theory
+    public void divied(int a, int b) throws Exception {
+        Assume.assumeTrue(b != 0);
+        System.out.println(String.format("a=%d,b=%d", a, b));
+        assertThat(Math.divied(a, b), not(equalTo(2)));
+    }
+}
+```
+
+运行结果如下：
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/2222997-462fa16dbd91a1eb.png?imageMogr2/auto-orient/strip|imageView2/2/w/234/format/webp)
+
+result
+
+
+从上面的测试用例可以看出，`MathTest`提供的数据集合为`{1,10,0}`，所以：
+**第一次** 运行测试用例`divied(int a, int b)`时，从集合中取出一个参数，即`1`会传递给参数`a`，然后又从集合中取出一个参数，也是`1`,传递给`b`，然后执行测试用例；
+**第二次** 运行时，参数`a`保持不变，然后从新从集合中取出下一个元素给到`b`，所以`b=10`，然后执行测试用例；
+**第三次** 运行时，参数`a`保持不变，然后从新从集合中取出下一个元素给到`b`，所以`b=0`，然后执行测试用例时，由于不满足`Assume`前置条件，故测试用例不再往下运行，直接退出，所以看到当`b=0`时，没有打印结果；
+**第四次** 运行时，由于`b`在前面第一轮运行时已完整取出了整个集合数据，所以此时就轮到参数`a`取出集合的下一个数据，即`a=10`，然后就按照前一轮的执行逻辑继续执行下去。
+
+
+
+从上面的分析中可以看出，[Theories](https://github.com/junit-team/junit4/wiki/Theories) 与 [Parameterized Tests](https://github.com/junit-team/junit4/wiki/Parameterized-tests) 很类似，两者都实现了多组数据共同作用于同一个测试用例的功能，不过两者的参数传递机制还是有很大的不同的， [Parameterized Tests](https://github.com/junit-team/junit4/wiki/Parameterized-tests) 可以提供多维数组的形式符合参数个数顺序，而 [Theories](https://github.com/junit-team/junit4/wiki/Theories) 的参数集合中的每个元素都会同时作用于各个参数；个人感觉还是 [Parameterized Tests](https://github.com/junit-team/junit4/wiki/Parameterized-tests) 更符合通常的测试逻辑。
+
+[Test Fixtures](https://github.com/junit-team/junit4/wiki/Test-fixtures) - 测试设备
+[Test Fixtures](https://github.com/junit-team/junit4/wiki/Test-fixtures) 是被用作测试用例运行的基准的一系列对象的混合状态，[Test Fixtures](https://github.com/junit-team/junit4/wiki/Test-fixtures) 为我们提供了4个注解（均用于方法上）：
+
+|  Annotation  |       Description        |
+| :----------: | :----------------------: |
+| @BeforeClass |     测试类运行时执行     |
+| @AfterClass  |     测试类结束时执行     |
+|   @Before    | 每个测试用例执行前先执行 |
+|    @After    | 每个测试用例执行后再执行 |
+
+[Categories](https://github.com/junit-team/junit4/wiki/Categories) - 分类
+[Categories](https://github.com/junit-team/junit4/wiki/Categories) 见名知意，就是将一系列测试类/测试方法进行分类，每个类或者接口都可以作为一个`Category`，且支持类别继承。
+比如，你指定一个测试用例属于`SuperClass.class`的类别（使用`@Category(SuperClass.class)`注解在测试类用例上），然后`@IncludeCategory(SuperClass.class)`，那么任何测试用例上注解了`@Category(SuperClass.class)`或者`@Category({SubClass.class})`的方法都会被执行。
+举个例子：
+
+1. 首先我们需要定义一个或多个测试类别（即`Category`)
+
+
+
+```java
+public class Category {
+    public static interface Category01 {}
+
+    public static interface Category02 {}
+
+    public static interface Category01Impl extends Category01{}
+}
+```
+
+这里有3种测试`Category`，其中，类别`Category01Impl`继承了类别`Category01`，所以任何`@IncludeCategory(Category01.class)`的测试类，测试时也会执行类别为`Category01Impl`的测试用例。
+
+1. 定义好了测试类别后，我们就需要将这些类别运用到测试类或者测试用例上
+
+
+
+```java
+public class Tests {
+    public static class Test01 {
+        @Test
+        @Category(Category01.class) //运用到测试用例上
+        public void test01() {
+            System.out.println("This testCase belongs to Category01");
+        }
+        @Test
+        @Category(Category01Impl.class)//运用到测试用例上
+        public void test01Impl() {
+            System.out.println("This testCase belongs to Category01Impl");
+        }
+    }
+
+    @Category(Category02.class)//运用到测试类上，类中所有测试方法都属于`Category02.class`这个类别
+    public static class Test02 {
+        @Test
+        public void test02() {
+            System.out.println("This testCase belongs to Category02");
+        }
+    }
+}
+```
+
+1. 最后，再`Categories`类别测试运行器上运行需要的测试用例即可
+
+
+
+```java
+@RunWith(Categories.class)
+@IncludeCategory(Category01.class)
+@SuiteClasses({Tests.Test01.class, Tests.Test02.class}) // Note that Category is a kind of Suite
+public class CategoryTest {
+}
+```
+
+更多详细信息，请查看：[Categories](https://github.com/junit-team/junit4/wiki/Categories)
+
+## Android Studio 进行单元测试
+
+假设我们需要对一个 Java Module 进行单元测试，采用 [JUnit](http://junit.org/junit4/) 框架，则部署步骤如下：
+
+- 在 `build.gralde` 中依赖 [JUnit](http://junit.org/junit4/):
+
+
+
+```groovy
+dependencies {
+     testImplementation 'junit:junit:4.12' //or testCompile
+}
+```
+
+- 创建一个类
+
+
+
+```java
+public class Math {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+```
+
+- 对上面的类`Math`的`add`方法进行测试
+  我们可以手动创建一个`Math`的测试类，但是借助于 Android Studio，我们可以很方面的使用快捷操作自动生成测试类和测试用例，具体做法为：打开要进行测试的类文件，双击类名/方法名进行选中，然后按快捷键:<Ctrl-Shift-T>
+
+![img](https://upload-images.jianshu.io/upload_images/2222997-e222ba344d6d3f7d.gif?imageMogr2/auto-orient/strip|imageView2/2/w/991/format/webp)
+
+创建测试用例
+
+- 最后，写上测试代码，进行测试就可以了。
+
+更多详细信息，请查看官网：[Building Local Unit Tests](https://developer.android.com/training/testing/unit-testing/local-unit-tests.html)
+
+
+
+https://www.jianshu.com/p/0530cb31c3b2
