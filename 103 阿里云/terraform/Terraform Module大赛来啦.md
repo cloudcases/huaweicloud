@@ -28,15 +28,13 @@ Terraform 模板征集大赛现火热招募中！！！本次大赛邀请所有�
 **为了解决您参加活动的云资源使用问题，大赛组委会将提供价值300元的全站云资源代金券**。请于12月06日前点击”[代金券申请](https://survey.aliyun.com/apps/zhiliao/aTgxW_AJ)“，上传Module的简单介绍或初步架构图，同时提供您开发Module的阿里云的账号ID（[具体可登录阿里云官网个人中心查看](https://account.console.aliyun.com/?spm=a2c81.fb365c1.amxosvpfn.7.459c1127ttjhOO#/secure)）。
 活动审核专家将在3个工作日对审核通过的申请账号ID发放代金券。（**注：同质化的架构图，以第一个申请者为准发放代金券**）。使用有效期为一个月，上限100，先到先得！
 
-# **[代金券申请](https://survey.aliyun.com/apps/zhiliao/aTgxW_AJ)**
-
 #### 1.2 Terraform Module编写规则：
 
 为了保证所提供的Module的质量和使用体验，**编写的Module请尽量实现如下几条规则，会帮助您更快速的通过奖品评审：**
 
-- 所提交的Module可以是对已注册Module https://registry.terraform.io/ 的重构和完善，也可以是对ROS模板或者其他友商模板的转换，也可以基于自定义的架构。来源不限，但要保证所要实现的Module必须从实际使用场景出发，以解决某种使用需求为目标，为Module使用者提供“开箱即用”的体验；
+- 所提交的Module可以是对已注册Module https://registry.terraform.io/ 的重构和完善，也可以是对ROS模板或者其他友商模板的转换，也可以基于自定义的架构。来源不限，但要保证所要实现的**Module必须从实际使用场景出发，以解决某种使用需求为目标**，为Module使用者提供“开箱即用”的体验；
 - 所提交的Module只能包含对阿里云资源的管理，在此基础上，所使用的Resource和Data Source 可以是包括其他Provider提供的；
-- 每个Module需要包含一个README（英文），并且README中至少要包含Module具体使用场景描述，涉及到的阿里云资源的介绍，Module背后的资源拓扑图，Module中所有的入参和出参的介绍和展示，可参考官方提供的Module Demo：[terraform-provider-demo](https://github.com/terraform-alicloud-modules/terraform-alicloud-demo)；
+- 每个Module需要包含一个README（英文），并且**README中至少要包含Module具体使用场景描述，涉及到的阿里云资源的介绍，Module背后的资源拓扑图，Module中所有的入参和出参的介绍和展示**，可参考官方提供的Module Demo：[terraform-provider-demo](https://github.com/terraform-alicloud-modules/terraform-alicloud-demo)；
 - 架构图中所使用的图标推荐使用阿里巴巴官方提供的图标，可在 https://www.iconfont.cn/ 中查询并下载；
 - 每个Module都需要显示声明Provider，并在Provider中设置参数 `configuration_source=<Github ID>/<Module 名字后缀>` 来对所编写的Module进行打标，同时Provider需要支持对Region的设置，以支持多Region的。可参考Module Demo：[terraform-provider-demo](https://github.com/terraform-alicloud-modules/terraform-alicloud-demo/blob/master/main.tf#L1)；
 - 每个Module都需要配置[Terratest测试](https://github.com/gruntwork-io/terratest)；
