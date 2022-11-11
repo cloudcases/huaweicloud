@@ -1,0 +1,72 @@
+# 产品优势
+
+更新时间：2022-06-22 GMT+08:00
+
+[查看PDF](https://support.huaweicloud.com/productdesc-ief/1 IEF 产品介绍_hws_new.pdf)
+
+[分享](javascript:void(0);)
+
+
+
+#### 丰富的智能边缘应用
+
+IEF提供丰富的智能边缘应用，提供流处理、视频分析、文字识别、图像识别等20+ AI模型部署到边缘节点运行，且提供边缘应用和云上服务协同能力。
+
+您可以在[智能边缘市场 > 边缘应用中心](https://console.huaweicloud.com/ief2.0/#/app/edgeMarket/application/list)查看各软件的详细信息。
+
+图1 丰富的智能边缘应用
+![img](https://support.huaweicloud.com/productdesc-ief/zh-cn_image_0172763682.png)
+
+#### 支持高性能边缘智能硬件
+
+IEF提供软硬一体化解决方案，为用户提供低成本、开箱即用、云上集中运维的一站式服务，提供华为通用服务器和AI专用硬件，与华为昇腾芯片深度集成，提供高性能、低成本的边缘AI推理算力，支持华为鲲鹏通用中央处理器的泰山服务器。
+
+您可以在[智能边缘市场 > 边缘硬件中心](https://console.huaweicloud.com/ief2.0/#/app/edgeMarket/hardware/list)查看各硬件的详细信息。
+
+图2 边缘硬件
+![img](https://support.huaweicloud.com/productdesc-ief/zh-cn_image_0172763684.png)
+
+#### 云边协同
+
+IEF能够方便的协同云端和边缘共同工作，例如在AI场景下，在云端使用[ModelArts](https://www.huaweicloud.com/product/modelarts.html)进行大数据量的训练生成AI模型，然后将AI模型打包成镜像通过IEF部署到边缘节点运行（推理），同时将边缘节点的数据通过[数据接入服务](https://www.huaweicloud.com/product/dis.html)（DIS）回传到云端，再使用ModelArts进一步训练，形成闭环。
+
+图3 构建边缘计算
+![img](https://support.huaweicloud.com/productdesc-ief/zh-cn_image_0172763686.png)
+
+#### 安全可靠
+
+- IAM认证
+
+  通过创建IAM角色，允许从边缘节点访问AOM、SWR、DIS等资源。
+
+- 边缘节点安全
+
+  Edge Agent创建专属服务用户，能够访问的目录和拥有的权限都受限，向云端上传日志、监控信息由用户自行选择。
+
+- 云边协同通讯安全
+
+  Edge Agent与IEF建立双向加密通道，Edge Agent自下向上发起，双向消息收发通过证书认证、加密。
+
+- 云安全
+
+  前置DDoS网络安全防护，防恶意攻击。
+
+  为每个边缘节点颁布唯一接入证书，双向通讯通过证书认证、加密。
+
+- 设备安全
+
+  终端设备使用证书进行身份认证。
+
+图4 IEF安全性方案
+![img](https://support.huaweicloud.com/productdesc-ief/zh-cn_image_0182389549.png)
+
+#### 开放兼容
+
+IEF基于开源的[KubeEdge](https://kubeedge.io/zh/)软件实现，KubeEdge基于Kubernetes构建，为云和边缘之间的网络、应用程序部署和元数据同步提供基础架构支持。
+
+使用KubeEdge便于开发者对边缘节点运行时（Edge Agent，边缘节点的管理程序）进行定制和裁剪，降低边缘的使用难度。
+
+#### 低成本
+
+- 云计算和边缘计算结合，在边缘节点处实现了对数据的过滤和分析，大幅提高效率，降低云端计算成本。
+- 在进行云端传输时通过边缘节点进行一部分简单数据处理，进而能够缩短终端设备响应时间，减少从终端设备到云端的数据流量，降低带宽成本。
